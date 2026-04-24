@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N - 2544 | APL CR Rewinding Line | YOGIJI DIGI</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --red: #c0392b;
+    --red-light: #fdf0ef;
+    --gray-50: #f9f9f9;
+    --gray-100: #f2f2f2;
+    --gray-200: #e5e5ea;
+    --gray-300: #d1d1d6;
+    --gray-500: #8e8e93;
+    --gray-700: #3a3a3c;
+    --gray-900: #1c1c1e;
+    --sidebar-w: 280px;
+    --header-h: 64px;
+    --co: #34c759;
+    --ip: #ff9500;
+    --ns: #8e8e93;
+    --co-bg: #f0faf3;
+    --ip-bg: #fff8ee;
+    --ns-bg: #f5f5f5;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--header-h);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    z-index: 100;
+  }
+  .header-logo {
+    height: 36px;
+    object-fit: contain;
+    margin-right: 20px;
+  }
+  .header-divider {
+    width: 1px; height: 28px;
+    background: var(--gray-200);
+    margin-right: 20px;
+  }
+  .header-project {
+    flex: 1;
+    min-width: 0;
+  }
+  .header-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .header-subtitle {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-top: 1px;
+  }
+  .header-badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 20px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+  .badge-pid { background: var(--red-light); color: var(--red); }
+  .badge-mgr { background: #f0f0f5; color: var(--gray-700); }
+  .badge-start { background: #f5fafe; color: #0071e3; }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: flex;
+    position: fixed;
+    top: var(--header-h);
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: #fff;
+    border-right: 1px solid var(--gray-200);
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+
+  .sidebar-section-header {
+    padding: 10px 16px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 1;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .task-group { border-bottom: 1px solid var(--gray-100); }
+
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 9px 14px 9px 12px;
+    cursor: pointer;
+    transition: background 0.12s;
+    border-left: 3px solid transparent;
+  }
+  .task-item:hover { background: var(--gray-50); }
+  .task-item.active {
+    background: var(--red-light);
+    border-left-color: var(--red);
+  }
+  .task-item-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .task-id-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    font-family: "SF Mono", monospace;
+  }
+  .task-item-text { flex: 1; min-width: 0; }
+  .task-item-name {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--gray-900);
+    line-height: 1.35;
+  }
+  .task-item.active .task-item-name { color: var(--red); font-weight: 600; }
+  .task-item-meta {
+    font-size: 10.5px;
+    color: var(--gray-500);
+    margin-top: 2px;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+  }
+  .dot-CO { background: var(--co); }
+  .dot-IP { background: var(--ip); }
+  .dot-NS { background: var(--ns); }
+
+  .subtask-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px 7px 28px;
+    cursor: pointer;
+    transition: background 0.12s;
+    border-left: 3px solid transparent;
+  }
+  .subtask-item:hover { background: var(--gray-50); }
+  .subtask-item.active {
+    background: var(--red-light);
+    border-left-color: var(--red);
+  }
+  .subtask-arrow {
+    font-size: 9px;
+    color: var(--gray-300);
+  }
+  .subtask-name {
+    font-size: 12px;
+    color: var(--gray-700);
+    flex: 1;
+    min-width: 0;
+    line-height: 1.3;
+  }
+  .subtask-item.active .subtask-name { color: var(--red); font-weight: 500; }
+  .subtask-status {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1.5px 6px;
+    border-radius: 10px;
+  }
+  .status-CO { background: var(--co-bg); color: #1a8a3a; }
+  .status-IP { background: var(--ip-bg); color: #c46200; }
+  .status-NS { background: var(--ns-bg); color: #636366; }
+
+  /* ── MAIN PANEL ── */
+  .main-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+    min-width: 0;
+  }
+  .main-panel::-webkit-scrollbar { width: 6px; }
+  .main-panel::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+
+  /* Overview cards */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .overview-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .overview-card-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .overview-card-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-top: 4px;
+    line-height: 1;
+  }
+  .overview-card-sub {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-top: 4px;
+  }
+
+  /* Detail panel */
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .panel-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gray-900);
+  }
+  .panel-subtitle {
+    font-size: 13px;
+    color: var(--gray-500);
+    margin-top: 2px;
+  }
+
+  /* Table */
+  .table-container {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .table-toolbar {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--gray-100);
+    gap: 12px;
+  }
+  .table-toolbar-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-900);
+  }
+  .table-count {
+    font-size: 12px;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  thead th {
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--gray-100);
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--gray-50); }
+  td {
+    padding: 9px 12px;
+    color: var(--gray-700);
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  td.mono {
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 11px;
+    color: var(--gray-500);
+  }
+  td.num { text-align: center; }
+  td.price {
+    font-family: "SF Mono", monospace;
+    font-size: 11.5px;
+    color: var(--gray-900);
+    font-weight: 600;
+    text-align: right;
+  }
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10.5px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Steps table (for subtasks with no component detail) */
+  .steps-table {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+  .step-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    gap: 12px;
+  }
+  .step-row:last-child { border-bottom: none; }
+  .step-type-badge {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 6px;
+    width: 70px;
+    text-align: center;
+  }
+  .step-type-step { background: #e8f0fe; color: #1967d2; }
+  .step-type-date { background: #fce8ff; color: #8430b4; }
+  .step-id { font-size: 10px; color: var(--gray-500); font-family: monospace; min-width: 56px; }
+  .step-name { flex: 1; font-size: 12.5px; color: var(--gray-700); }
+  .step-duration { font-size: 11px; color: var(--gray-500); min-width: 40px; }
+
+  /* Welcome state */
+  .welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60%;
+    text-align: center;
+    color: var(--gray-500);
+  }
+  .welcome-icon { font-size: 48px; margin-bottom: 12px; }
+  .welcome-title { font-size: 17px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+  .welcome-sub { font-size: 13px; }
+
+  /* Section task cards in overview */
+  .task-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .task-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 14px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-top: 3px solid transparent;
+  }
+  .task-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); transform: translateY(-1px); }
+  .task-card.ip { border-top-color: var(--ip); }
+  .task-card.co { border-top-color: var(--co); }
+  .task-card.ns { border-top-color: var(--ns); }
+  .task-card-id {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gray-500);
+    font-family: monospace;
+    margin-bottom: 4px;
+  }
+  .task-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-900);
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .task-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+  .task-card-dur { font-size: 11px; color: var(--gray-500); }
+
+  /* Phase section heading */
+  .phase-heading {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin: 24px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .phase-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gray-200);
+  }
+
+  /* Vendor pill */
+  .vendor-pill {
+    display: inline-block;
+    background: #f5f0ff;
+    color: #6e4cc0;
+    border-radius: 6px;
+    padding: 1px 6px;
+    font-size: 10.5px;
+    font-weight: 500;
+  }
+  .po-pill {
+    font-family: "SF Mono", monospace;
+    font-size: 10.5px;
+    color: #0071e3;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .sidebar { width: 240px; }
+    .header-badges { display: none; }
+    .main-panel { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <img src="YDLOGO.png" class="header-logo" alt="YD Logo" onerror="this.style.display='none'">
+  <div class="header-divider"></div>
+  <div class="header-project">
+    <div class="header-title" id="proj-name">Loading...</div>
+    <div class="header-subtitle">Project Management Dashboard</div>
+  </div>
+  <div class="header-badges">
+    <span class="badge badge-pid">PID <span id="pid">—</span></span>
+    <span class="badge badge-mgr">👤 <span id="mgr">—</span></span>
+    <span class="badge badge-start">📅 Start: <span id="start-date">—</span></span>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section-header">Project Tasks</div>
+    <div id="sidebar-tree"></div>
+  </div>
+
+  <!-- MAIN PANEL -->
+  <div class="main-panel" id="main-panel">
+    <div class="welcome">
+      <div class="welcome-icon">🏭</div>
+      <div class="welcome-title">Select a task or subtask</div>
+      <div class="welcome-sub">Click an item in the sidebar to view details</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── DATA ── -->
+<script src="project_data.js"></script>
+
+<!-- ── APP ── -->
+<script>
+const D = PROJECT_DATA;
+let selectedId = null;
+
+// ── STATUS helpers ──
+function statusBadge(s) {
+  const labels = { CO: 'Completed', IP: 'In Progress', NS: 'Not Started' };
+  const cls = { CO: 'status-CO', IP: 'status-IP', NS: 'status-NS' };
+  const dot = { CO: '●', IP: '●', NS: '●' };
+  const color = { CO: 'var(--co)', IP: 'var(--ip)', NS: 'var(--ns)' };
+  const text = labels[s] || s;
+  const cl = cls[s] || 'status-NS';
+  return `<span class="status-badge ${cl}"><span style="color:${color[s] || 'var(--ns)'}; font-size:8px">●</span> ${text}</span>`;
+}
+function statusClass(s) {
+  return { 'CO': 'co', 'IP': 'ip', 'NS': 'ns' }[s] || 'ns';
+}
+function dotDiv(s) {
+  return `<span class="status-dot dot-${s}"></span>`;
+}
+function fmtPrice(p) {
+  if (!p || p === '' || p === 0) return '—';
+  const n = parseFloat(p);
+  if (isNaN(n)) return p;
+  return '₹ ' + n.toLocaleString('en-IN');
+}
+function taskColor(i) {
+  const colors = ['#e63946','#0077b6','#2a9d8f','#e9c46a','#6a4c93','#f4a261','#457b9d','#264653','#e76f51','#52796f','#dc2f02','#0096c7'];
+  return colors[parseInt(i) % colors.length];
+}
+
+// ── INIT header ──
+document.getElementById('proj-name').textContent = D.name;
+document.getElementById('pid').textContent = D.id;
+document.getElementById('mgr').textContent = D.manager;
+document.getElementById('start-date').textContent = D.plannedStart;
+
+// ── BUILD SIDEBAR ──
+function buildSidebar() {
+  const tree = document.getElementById('sidebar-tree');
+  D.tasks.forEach(task => {
+    const group = document.createElement('div');
+    group.className = 'task-group';
+
+    // Task row
+    const taskEl = document.createElement('div');
+    taskEl.className = 'task-item';
+    taskEl.dataset.id = task.id;
+    const col = taskColor(task.id);
+    taskEl.innerHTML = `
+      <div class="task-item-icon" style="background:${col}20; color:${col}">
+        <span class="task-id-num" style="color:${col}">${task.id}</span>
+      </div>
+      <div class="task-item-text">
+        <div class="task-item-name">${task.name}</div>
+        <div class="task-item-meta">${dotDiv(task.status)}${task.status === 'IP' ? 'In Progress' : task.status === 'CO' ? 'Completed' : 'Not Started'} · ${task.duration || '—'}</div>
+      </div>`;
+    taskEl.addEventListener('click', () => selectTask(task));
+    group.appendChild(taskEl);
+
+    // Subtask rows (if any)
+    task.subtasks.forEach(sub => {
+      const subEl = document.createElement('div');
+      subEl.className = 'subtask-item';
+      subEl.dataset.id = sub.id;
+      subEl.innerHTML = `
+        <span class="subtask-arrow">↳</span>
+        <div class="subtask-name">${sub.name}</div>
+        <span class="subtask-status status-${sub.status}">${sub.status}</span>`;
+      subEl.addEventListener('click', (e) => { e.stopPropagation(); selectSubtask(sub, task); });
+      group.appendChild(subEl);
+    });
+
+    tree.appendChild(group);
+  });
+}
+
+// ── HELPERS for highlight ──
+function clearActive() {
+  document.querySelectorAll('.task-item.active, .subtask-item.active').forEach(el => el.classList.remove('active'));
+}
+
+// ── SELECT TASK ──
+function selectTask(task) {
+  clearActive();
+  document.querySelector(`.task-item[data-id="${task.id}"]`)?.classList.add('active');
+  selectedId = task.id;
+
+  const panel = document.getElementById('main-panel');
+  const col = taskColor(task.id);
+  const subtasksHtml = task.subtasks.map(sub => {
+    const comps = D.subtaskComponents[sub.name];
+    const compCount = comps ? comps.length : (sub.steps.length);
+    return `<div class="task-card ${statusClass(sub.status)}" onclick="selectSubtask(${JSON.stringify(sub).replace(/"/g,'&quot;')}, ${JSON.stringify(task).replace(/"/g,'&quot;')})">
+      <div class="task-card-id">${sub.id}</div>
+      <div class="task-card-name">${sub.name}</div>
+      <div class="task-card-footer">
+        ${statusBadge(sub.status)}
+        <span class="task-card-dur">${compCount} items</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="panel-header">
+      <div style="width:40px;height:40px;border-radius:10px;background:${col}20;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:${col}; flex-shrink:0;">${task.id}</div>
+      <div>
+        <div class="panel-title">${task.name}</div>
+        <div class="panel-subtitle">${statusBadge(task.status)} &nbsp;·&nbsp; Duration: ${task.duration || '—'} &nbsp;·&nbsp; Index: ${task.index || '—'}</div>
+      </div>
+    </div>
+    ${task.subtasks.length ? `
+      <div class="phase-heading">Subtasks</div>
+      <div class="task-cards">${subtasksHtml}</div>
+    ` : `
+      <div class="table-container">
+        <div class="table-toolbar">
+          <span class="table-toolbar-title">Task Steps</span>
+          <span class="table-count">${task.subtasks.length} subtasks</span>
+        </div>
+        <div style="padding:40px;text-align:center;color:var(--gray-500)">No subtasks for this task. Select another task.</div>
+      </div>
+    `}
+  `;
+}
+
+// ── SELECT SUBTASK ──
+function selectSubtask(sub, task) {
+  clearActive();
+  const subEl = document.querySelector(`.subtask-item[data-id="${sub.id}"]`);
+  if (subEl) subEl.classList.add('active');
+  const taskEl = document.querySelector(`.task-item[data-id="${task.id}"]`);
+  if (taskEl) taskEl.classList.add('active');
+
+  const panel = document.getElementById('main-panel');
+  const comps = D.subtaskComponents[sub.name];
+
+  let contentHtml = '';
+  if (comps && comps.length > 0) {
+    // Component table from detail Excel
+    const rows = comps.map((c, i) => {
+      const price = fmtPrice(c.price);
+      const hasVendor = c.vendor && c.vendor.trim();
+      const hasPO = c.poNumber && String(c.poNumber).trim() && String(c.poNumber) !== '0';
+      return `<tr>
+        <td class="num" style="color:var(--gray-500);font-size:11px">${c.srNo}</td>
+        <td><strong style="font-size:12px">${c.joblist}</strong>
+          ${c.assemblyName ? `<br><span style="font-size:10.5px;color:var(--gray-500)">${c.assemblyName}</span>` : ''}
+        </td>
+        <td class="mono">${c.dwgNo || '—'}</td>
+        <td class="num">${c.qty || '—'}</td>
+        <td style="font-size:11.5px;color:var(--gray-500)">${c.material || '—'}</td>
+        <td class="num" style="font-size:11.5px">${c.weight ? c.weight + ' kg' : '—'}</td>
+        <td>${hasVendor ? `<span class="vendor-pill">${c.vendor}</span>` : '—'}</td>
+        <td>${hasPO ? `<span class="po-pill">${c.poNumber}</span>` : '—'}</td>
+        <td class="price">${price}</td>
+        <td>${statusBadge(c.poStatus)}<br><span style="font-size:10px;color:var(--gray-500);margin-top:2px;display:block">${c.poDate || ''}</span></td>
+        <td>${statusBadge(c.assemblyStatus)}<br><span style="font-size:10px;color:var(--gray-500);margin-top:2px;display:block">${c.assemblyDate || ''}</span></td>
+      </tr>`;
+    }).join('');
+
+    // Summary stats
+    const total = comps.length;
+    const coCount = comps.filter(c => c.poStatus === 'CO').length;
+    const ipCount = comps.filter(c => c.poStatus === 'IP').length;
+    const nsCount = comps.filter(c => c.poStatus === 'NS').length;
+    const totalPrice = comps.reduce((acc, c) => acc + (parseFloat(c.price) || 0), 0);
+
+    contentHtml = `
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="overview-card-label">Total Components</div>
+          <div class="overview-card-value">${total}</div>
+          <div class="overview-card-sub">in this subtask</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-card-label">PO Released</div>
+          <div class="overview-card-value" style="color:var(--co)">${coCount}</div>
+          <div class="overview-card-sub">Completed</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-card-label">In Progress</div>
+          <div class="overview-card-value" style="color:var(--ip)">${ipCount}</div>
+          <div class="overview-card-sub">Under process</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-card-label">Not Started</div>
+          <div class="overview-card-value" style="color:var(--ns)">${nsCount}</div>
+          <div class="overview-card-sub">Pending</div>
+        </div>
+        ${totalPrice > 0 ? `<div class="overview-card">
+          <div class="overview-card-label">Total Value</div>
+          <div class="overview-card-value" style="font-size:18px">${(totalPrice/100000).toFixed(1)}L</div>
+          <div class="overview-card-sub">${fmtPrice(totalPrice)}</div>
+        </div>` : ''}
+      </div>
+
+      <div class="table-container">
+        <div class="table-toolbar">
+          <span class="table-toolbar-title">Bill of Materials — ${sub.name}</span>
+          <span class="table-count">${total} components</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Joblist / Assembly</th>
+                <th>Drawing No.</th>
+                <th>Qty</th>
+                <th>Material</th>
+                <th>Weight</th>
+                <th>Vendor</th>
+                <th>PO Number</th>
+                <th style="text-align:right">Price</th>
+                <th>Release of PO</th>
+                <th>Ready for Assembly</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>`;
+  } else {
+    // Steps from main plan
+    const steps = sub.steps || [];
+    const stepRows = steps.map(st => {
+      return `<div class="step-row">
+        <span class="step-id">${st.id}</span>
+        <span class="step-type-badge step-type-${st.type}">${st.type}</span>
+        <span class="step-name">${st.name}</span>
+        <span class="step-duration">${st.duration || ''}</span>
+        ${statusBadge(st.status)}
+      </div>`;
+    }).join('');
+    contentHtml = `
+      <div class="steps-table">
+        <div class="table-toolbar">
+          <span class="table-toolbar-title">Process Steps</span>
+          <span class="table-count">${steps.length} steps</span>
+        </div>
+        ${stepRows || '<div style="padding:32px;text-align:center;color:var(--gray-500)">No steps recorded.</div>'}
+      </div>`;
+  }
+
+  panel.innerHTML = `
+    <div class="panel-header">
+      <div>
+        <div class="panel-title">${sub.name}</div>
+        <div class="panel-subtitle">
+          ${statusBadge(sub.status)} &nbsp;·&nbsp;
+          <span style="color:var(--gray-500);font-size:12px">Part of: <strong style="color:var(--gray-700)">${task.name}</strong></span>
+          &nbsp;·&nbsp; Duration: ${sub.duration || '—'}
+        </div>
+      </div>
+    </div>
+    ${contentHtml}
+  `;
+}
+
+// ── EXPOSE globals for onclick ──
+window.selectSubtask = selectSubtask;
+window.selectTask = selectTask;
+
+// ── BOOT ──
+buildSidebar();
+
+// Auto-open first subtask
+const firstTask = D.tasks.find(t => t.subtasks.length > 0);
+if (firstTask) selectTask(firstTask);
+</script>
+</body>
+</html>
