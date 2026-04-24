@@ -3,6 +3,7 @@ import { writeFile } from 'fs/promises';
 import path from 'path';
 import dbConnect from '@/lib/mongodb';
 import Project from '@/models/Project';
+import { parseProjectBOM } from '@/lib/parser';
 
 export async function GET() {
   try {
@@ -52,6 +53,16 @@ export async function POST(request: NextRequest) {
 
     const project = new Project(projectData);
     await project.save();
+
+    if (project.excelFile) {
+      try {
+        await parseProjectBOM(project._id.toString(), project.excelFile);
+      } catch (parseError) {
+        console.error('Error parsing BOM during creation:', parseError);
+        // We continue anyway as the project is saved, but maybe return a warning?
+        // For now, just log the error.
+      }
+    }
 
     return NextResponse.json(project, { status: 201 });
   } catch (error) {

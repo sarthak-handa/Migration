@@ -25,78 +25,58 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       <header className="flex items-center justify-center py-8">
-        <Image
-          src="/YDLOGO.png"
-          alt="YD Logo"
-          width={100}
-          height={50}
-          priority
-        />
+        <Link href="/">
+          <Image
+            src="/YDLOGO.png"
+            alt="YD Logo"
+            width={100}
+            height={50}
+            priority
+          />
+        </Link>
       </header>
-      <main className="container mx-auto px-4">
+      <main className="container mx-auto px-4 max-w-4xl">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-semibold">Projects</h1>
-          <Link href="/create-project" className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">
+          <Link href="/create-project" className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors">
             Create Project
           </Link>
         </div>
         <div className="grid gap-4">
           {projects.length === 0 ? (
-            <p>No projects yet. Create your first project!</p>
+            <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+              <p className="text-gray-500">No projects yet. Create your first project!</p>
+            </div>
           ) : (
             projects.map((project) => (
-              <div key={project._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h2 className="text-lg font-medium">{project.name}</h2>
-                <p className="text-gray-600">Planned Start: {new Date(project.plannedStart).toLocaleDateString()}</p>
-                <p className="text-gray-600">Due Date: {new Date(project.dueDate).toLocaleDateString()}</p>
-              </div>
+              <Link 
+                key={project._id} 
+                href={`/projects/${project._id}`} 
+                className="group block border border-gray-200 rounded-xl p-6 hover:border-red-500 hover:shadow-sm transition-all bg-white"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 group-hover:text-red-500 transition-colors">{project.name}</h2>
+                    <div className="mt-2 space-y-1">
+                      <p className="text-sm text-gray-500 flex items-center">
+                        <span className="w-24 font-medium">Planned Start:</span>
+                        {new Date(project.plannedStart).toLocaleDateString()}
+                      </p>
+                      <p className="text-sm text-gray-500 flex items-center">
+                        <span className="w-24 font-medium">Due Date:</span>
+                        {new Date(project.dueDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-gray-400 group-hover:text-red-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </Link>
             ))
           )}
-        </div>
-      </main>
-    </div>
-  );
-}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
         </div>
       </main>
     </div>

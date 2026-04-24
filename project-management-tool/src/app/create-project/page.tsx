@@ -172,7 +172,11 @@ export default function CreateProject() {
               </div>
             </div>
             <p className="text-sm text-gray-500 mt-2">
-              Download the excel template here, update the plan and upload updated file again.
+              Download the {' '}
+              <a href="/templates/bom_template.xlsx" download className="text-red-500 hover:underline font-medium">
+                excel template here
+              </a>, 
+              update the plan and upload updated file again.
               Please read instruction given in template carefully before uploading.
             </p>
           </div>
